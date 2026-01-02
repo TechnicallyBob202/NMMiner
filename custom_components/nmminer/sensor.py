@@ -153,14 +153,6 @@ SENSOR_TYPES: tuple[NMMinerSensorEntityDescription, ...] = (
         value_fn=lambda data: data.get("RSSI", -100),
     ),
     NMMinerSensorEntityDescription(
-        key="progress",
-        name="Progress",
-        native_unit_of_measurement=PERCENTAGE,
-        state_class=SensorStateClass.MEASUREMENT,
-        icon="mdi:progress-clock",
-        value_fn=lambda data: round(data.get("Progress", 0) * 100, 2) if data.get("Progress") else 0,
-    ),
-    NMMinerSensorEntityDescription(
         key="pool",
         name="Pool",
         icon="mdi:server-network",
