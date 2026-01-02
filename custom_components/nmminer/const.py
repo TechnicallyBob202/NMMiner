@@ -2,7 +2,7 @@
 from typing import Final
 
 DOMAIN: Final = "nmminer"
-DEFAULT_PORT: Final = 37778
+DEFAULT_PORT: Final = 12345
 
 # Config flow
 CONF_PORT: Final = "port"

@@ -118,7 +118,7 @@ nmminer_ha_proper/
 Miner (ESP32)
     |
     | UDP Broadcast (every 5s)
-    | Port 37778
+    | Port 12345
     v
 NMMinerProtocol.datagram_received()
     |

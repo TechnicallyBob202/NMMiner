@@ -33,7 +33,7 @@
    - Settings → Devices & Services
    - Click "+ Add Integration"
    - Search for "NMMiner"
-   - Configure UDP port (default: 37778)
+   - Configure UDP port (default: 12345)
    - Click "Submit"
 
 6. **Done!**
@@ -161,7 +161,7 @@ docker-compose restart homeassistant
 
 1. **Check Logs**
    - Settings → System → Logs
-   - Look for: `NMMiner UDP listener started on port 37778`
+   - Look for: `NMMiner UDP listener started on port 12345`
 
 2. **Verify Integration**
    - Settings → Devices & Services
@@ -183,7 +183,7 @@ docker-compose restart homeassistant
 #### Miners not discovered
 ```bash
 # On HA host, check if broadcasts are reaching HA
-sudo tcpdump -i any -n udp port 37778 -A
+sudo tcpdump -i any -n udp port 12345 -A
 ```
 
 You should see JSON data every 5 seconds.
@@ -191,10 +191,10 @@ You should see JSON data every 5 seconds.
 #### Firewall blocking
 ```bash
 # Allow UDP port
-sudo ufw allow 37778/udp
+sudo ufw allow 12345/udp
 
 # Or for firewalld
-sudo firewall-cmd --add-port=37778/udp --permanent
+sudo firewall-cmd --add-port=12345/udp --permanent
 sudo firewall-cmd --reload
 ```
 
@@ -239,24 +239,24 @@ rm -rf custom_components/nmminer
 ## Network Configuration
 
 ### Required Ports
-- **UDP 37778** (default) - For miner broadcasts
+- **UDP 12345** (default) - For miner broadcasts
 
 ### Firewall Rules
 
 **UFW:**
 ```bash
-sudo ufw allow 37778/udp comment 'NMMiner broadcasts'
+sudo ufw allow 12345/udp comment 'NMMiner broadcasts'
 ```
 
 **iptables:**
 ```bash
-sudo iptables -A INPUT -p udp --dport 37778 -j ACCEPT
+sudo iptables -A INPUT -p udp --dport 12345 -j ACCEPT
 sudo iptables-save > /etc/iptables/rules.v4
 ```
 
 **firewalld:**
 ```bash
-sudo firewall-cmd --add-port=37778/udp --permanent
+sudo firewall-cmd --add-port=12345/udp --permanent
 sudo firewall-cmd --reload
 ```
 
@@ -265,7 +265,7 @@ sudo firewall-cmd --reload
 If your miners are on a different VLAN:
 1. Ensure VLAN routing is configured
 2. Allow UDP broadcasts between VLANs
-3. Test with: `sudo tcpdump -i any -n udp port 37778`
+3. Test with: `sudo tcpdump -i any -n udp port 12345`
 
 ---
 

@@ -9,7 +9,7 @@ Your ESP32 Bitcoin miners will now automatically appear in Home Assistant.
    - Go to Settings → Integrations
    - Click "+ Add Integration"
    - Search for "NMMiner"
-   - Configure the UDP port (default: 37778)
+   - Configure the UDP port (default: 12345)
 
 2. **Wait for Auto-Discovery**:
    - Your miners should appear within 10 seconds
@@ -39,7 +39,7 @@ Your ESP32 Bitcoin miners will now automatically appear in Home Assistant.
 - 📱 Full device & entity registry support
 
 ### Troubleshooting:
-- **Miners not appearing?** Check that UDP port 37778 isn't blocked by firewall
+- **Miners not appearing?** Check that UDP port 12345 isn't blocked by firewall
 - **Sensors unavailable?** Wait 30 seconds for first broadcast
 - **Need help?** Check the [full documentation](https://github.com/NMminer1024/NMMiner)
 
@@ -71,7 +71,7 @@ Monitor your ESP32-based Bitcoin miners with this native Home Assistant integrat
 
 - Home Assistant 2024.1.0 or newer
 - ESP32 miners running NMMiner firmware v0.3.01 or later
-- Miners configured to broadcast on UDP (default port 37778)
+- Miners configured to broadcast on UDP (default port 12345)
 - Network connectivity between HA and miners
 
 ### Quick Start:
@@ -79,7 +79,7 @@ Monitor your ESP32-based Bitcoin miners with this native Home Assistant integrat
 1. Install this integration via HACS
 2. Restart Home Assistant
 3. Add via Settings → Integrations → "+ Add Integration" → "NMMiner"
-4. Configure UDP port (default: 37778)
+4. Configure UDP port (default: 12345)
 5. Your miners will auto-discover!
 
 ### Documentation:

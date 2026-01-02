@@ -34,7 +34,7 @@ A proper Home Assistant custom integration for monitoring ESP32-based Bitcoin mi
 ## Configuration
 
 1. After adding the integration, you'll be prompted for:
-   - **UDP Port**: The port your miners broadcast on (default: 37778)
+   - **UDP Port**: The port your miners broadcast on (default: 12345)
 
 2. Click Submit
 
@@ -251,12 +251,12 @@ cards:
 ### No miners appearing
 1. **Verify UDP broadcasts are reaching HA:**
    ```bash
-   sudo tcpdump -i any -n udp port 37778 -A
+   sudo tcpdump -i any -n udp port 12345 -A
    ```
    
 2. **Check firewall:**
    ```bash
-   sudo ufw allow 37778/udp
+   sudo ufw allow 12345/udp
    ```
 
 3. **Verify miners are broadcasting:**
@@ -276,7 +276,7 @@ cards:
 ## Technical Details
 
 - **Architecture**: Modern HA integration using DataUpdateCoordinator
-- **Protocol**: UDP broadcasts on configurable port (default 37778)
+- **Protocol**: UDP broadcasts on configurable port (default 12345)
 - **Update Method**: Push-based (miners broadcast every 5 seconds)
 - **Data Format**: JSON payload
 - **Device Discovery**: Automatic based on IP in broadcast
