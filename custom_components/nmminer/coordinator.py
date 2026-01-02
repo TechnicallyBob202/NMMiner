@@ -95,7 +95,8 @@ class NMMinerProtocol(asyncio.DatagramProtocol):
         """Handle received datagram."""
         try:
             payload = json.loads(data.decode("utf-8"))
-            miner_ip = payload.get("IP")
+            # Use IP from payload, or fall back to source address
+            miner_ip = payload.get("IP") or addr[0]
             
             if not miner_ip:
                 _LOGGER.debug("Received broadcast without IP from %s", addr)
