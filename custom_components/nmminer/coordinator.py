@@ -95,12 +95,16 @@ class NMMinerProtocol(asyncio.DatagramProtocol):
         """Handle received datagram."""
         try:
             payload = json.loads(data.decode("utf-8"))
-            # Use IP from payload, or fall back to source address
-            miner_ip = payload.get("IP") or addr[0]
+            
+            # Use lowercase 'ip' or uppercase 'IP', fallback to source address
+            miner_ip = payload.get("ip") or payload.get("IP") or addr[0]
             
             if not miner_ip:
                 _LOGGER.debug("Received broadcast without IP from %s", addr)
                 return
+            
+            # Log raw payload for debugging
+            _LOGGER.debug("Received data from %s: %s", miner_ip, payload)
             
             # Process in the event loop
             self.coordinator.hass.loop.call_soon_threadsafe(
