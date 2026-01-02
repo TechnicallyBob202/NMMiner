@@ -180,6 +180,10 @@ async def async_setup_entry(
         """Add sensors for newly discovered miners."""
         new_entities: list[NMMinerSensor] = []
         
+        # Handle None data during initialization
+        if not coordinator.data:
+            return
+        
         for miner_ip in coordinator.data:
             if miner_ip not in created_miners:
                 _LOGGER.info("Creating sensors for miner %s", miner_ip)
