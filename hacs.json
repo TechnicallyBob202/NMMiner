@@ -1,0 +1,9 @@
+{
+  "name": "NMMiner",
+  "content_in_root": false,
+  "filename": "nmminer",
+  "render_readme": true,
+  "homeassistant": "2024.1.0",
+  "domains": ["sensor"],
+  "iot_class": "Local Push"
+}

@@ -1,0 +1,420 @@
+# NMMiner Automation Examples
+
+## Block Hit Notifications
+
+### Basic Notification
+
+```yaml
+automation:
+  - alias: "NMMiner - Block Found"
+    description: "Notify when any miner finds a block"
+    trigger:
+      - platform: event
+        event_type: nmminer_block_found
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "🎉 Bitcoin Block Found!"
+          message: >
+            Miner {{ trigger.event.data.miner_ip }} found a valid block!
+            Total Blocks: {{ trigger.event.data.valid_blocks }}
+            Best Diff: {{ trigger.event.data.best_diff }}
+            Hashrate: {{ trigger.event.data.hashrate }}
+```
+
+### Discord Notification
+
+```yaml
+automation:
+  - alias: "NMMiner - Block Found Discord"
+    trigger:
+      - platform: event
+        event_type: nmminer_block_found
+    action:
+      - service: notify.discord
+        data:
+          message: |
+            🎉💎 **BITCOIN BLOCK FOUND!** 💎🎉
+            
+            **Miner:** {{ trigger.event.data.miner_ip }}
+            **Valid Blocks:** {{ trigger.event.data.valid_blocks }}
+            **Best Diff:** {{ trigger.event.data.best_diff }}
+            **Hashrate:** {{ trigger.event.data.hashrate }}
+            
+            @everyone
+```
+
+### Telegram Notification with Photo
+
+```yaml
+automation:
+  - alias: "NMMiner - Block Found Telegram"
+    trigger:
+      - platform: event
+        event_type: nmminer_block_found
+    action:
+      - service: notify.telegram
+        data:
+          title: "💎 Block Found!"
+          message: >
+            Miner {{ trigger.event.data.miner_ip }} found a block!
+            
+            📊 Stats:
+            • Valid Blocks: {{ trigger.event.data.valid_blocks }}
+            • Best Diff: {{ trigger.event.data.best_diff }}
+            • Hashrate: {{ trigger.event.data.hashrate }}
+```
+
+### Persistent Notification
+
+```yaml
+automation:
+  - alias: "NMMiner - Block Found Persistent"
+    trigger:
+      - platform: event
+        event_type: nmminer_block_found
+    action:
+      - service: persistent_notification.create
+        data:
+          title: "🎉 Block Found!"
+          message: >
+            Miner {{ trigger.event.data.miner_ip }} found block #{{ trigger.event.data.valid_blocks }}!
+            
+            Best difficulty: {{ trigger.event.data.best_diff }}
+          notification_id: "nmminer_block_{{ trigger.event.data.miner_ip }}"
+```
+
+## Monitoring Automations
+
+### High Temperature Alert
+
+```yaml
+automation:
+  - alias: "NMMiner - High Temperature Alert"
+    description: "Alert when miner temperature exceeds threshold"
+    trigger:
+      - platform: numeric_state
+        entity_id:
+          - sensor.nmminer_192_168_1_101_temperature
+          - sensor.nmminer_192_168_1_102_temperature
+          - sensor.nmminer_192_168_1_103_temperature
+        above: 65
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "⚠️ Miner Overheating"
+          message: >
+            {{ trigger.to_state.attributes.friendly_name }} is at {{ trigger.to_state.state }}°C
+          data:
+            tag: "miner_temp_{{ trigger.entity_id }}"
+            priority: high
+```
+
+### Critical Temperature - Emergency Shutdown
+
+```yaml
+automation:
+  - alias: "NMMiner - Emergency Shutdown on Critical Temp"
+    description: "Turn off smart plug if temperature is critical"
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.nmminer_192_168_1_101_temperature
+        above: 75
+    action:
+      - service: switch.turn_off
+        target:
+          entity_id: switch.miner_power_plug
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "🚨 EMERGENCY - Miner Shutdown"
+          message: "Miner reached {{ trigger.to_state.state }}°C - Power cut!"
+          data:
+            priority: high
+            ttl: 0
+```
+
+### Miner Offline Alert
+
+```yaml
+automation:
+  - alias: "NMMiner - Offline Alert"
+    description: "Alert when miner stops broadcasting"
+    trigger:
+      - platform: state
+        entity_id:
+          - sensor.nmminer_192_168_1_101_hashrate
+          - sensor.nmminer_192_168_1_102_hashrate
+          - sensor.nmminer_192_168_1_103_hashrate
+        to: "unavailable"
+        for:
+          minutes: 2
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "⚠️ Miner Offline"
+          message: "{{ trigger.to_state.attributes.friendly_name }} has been offline for 2 minutes"
+```
+
+### Low Hashrate Alert
+
+```yaml
+automation:
+  - alias: "NMMiner - Low Hashrate Alert"
+    description: "Alert when hashrate drops below threshold"
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.nmminer_192_168_1_101_hashrate
+        below: 100000  # 100 KH/s
+        for:
+          minutes: 5
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "⚠️ Low Hashrate"
+          message: >
+            Miner 1 hashrate: {{ (trigger.to_state.state | float / 1000) | round(2) }} KH/s
+```
+
+### Poor WiFi Signal Alert
+
+```yaml
+automation:
+  - alias: "NMMiner - Weak WiFi Signal"
+    description: "Alert when WiFi signal is weak"
+    trigger:
+      - platform: numeric_state
+        entity_id:
+          - sensor.nmminer_192_168_1_101_wifi_signal
+          - sensor.nmminer_192_168_1_102_wifi_signal
+        below: -75  # dBm
+        for:
+          minutes: 10
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "📶 Weak WiFi Signal"
+          message: >
+            {{ trigger.to_state.attributes.friendly_name }}: {{ trigger.to_state.state }} dBm
+```
+
+## Daily Reports
+
+### Daily Mining Summary
+
+```yaml
+automation:
+  - alias: "NMMiner - Daily Report"
+    description: "Send daily mining statistics"
+    trigger:
+      - platform: time
+        at: "20:00:00"
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "📊 Daily Mining Report"
+          message: >
+            **Blocks Found Today:**
+            {% for state in states.sensor 
+               if 'nmminer' in state.entity_id 
+               and 'valid_blocks' in state.entity_id %}
+            • {{ state.attributes.friendly_name.split(' ')[1] }}: {{ state.state }}
+            {% endfor %}
+            
+            **Total Hashrate:** {{ states('sensor.total_mining_hashrate') }} KH/s
+            
+            **Highest Temperature:** 
+            {{ states.sensor 
+               | selectattr('entity_id', 'search', 'nmminer.*temperature') 
+               | map(attribute='state') 
+               | map('float') 
+               | max }} °C
+```
+
+### Weekly Summary with Statistics
+
+```yaml
+automation:
+  - alias: "NMMiner - Weekly Summary"
+    description: "Weekly mining performance summary"
+    trigger:
+      - platform: time
+        at: "09:00:00"
+    condition:
+      - condition: time
+        weekday:
+          - mon
+    action:
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "📈 Weekly Mining Summary"
+          message: >
+            **This Week:**
+            • Total Blocks: {{ states('sensor.total_blocks_found') }}
+            • Average Hashrate: {{ states('sensor.total_mining_hashrate') }} KH/s
+            • Uptime: All miners running
+            
+            Keep mining! 🚀
+```
+
+## Smart Automations
+
+### Auto-Restart on Extended Downtime
+
+```yaml
+automation:
+  - alias: "NMMiner - Auto Restart"
+    description: "Restart miner if offline for extended period"
+    trigger:
+      - platform: state
+        entity_id: sensor.nmminer_192_168_1_101_hashrate
+        to: "unavailable"
+        for:
+          minutes: 10
+    action:
+      - service: switch.turn_off
+        target:
+          entity_id: switch.miner_1_power
+      - delay:
+          seconds: 10
+      - service: switch.turn_on
+        target:
+          entity_id: switch.miner_1_power
+      - service: notify.mobile_app_your_phone
+        data:
+          title: "🔄 Miner Auto-Restart"
+          message: "Miner 1 was automatically restarted due to extended downtime"
+```
+
+### Adaptive Cooling
+
+```yaml
+automation:
+  - alias: "NMMiner - Adaptive Cooling"
+    description: "Adjust fan speed based on temperature"
+    trigger:
+      - platform: state
+        entity_id: sensor.nmminer_192_168_1_101_temperature
+    action:
+      - choose:
+          - conditions:
+              - condition: numeric_state
+                entity_id: sensor.nmminer_192_168_1_101_temperature
+                above: 60
+            sequence:
+              - service: fan.set_percentage
+                target:
+                  entity_id: fan.miner_cooling_fan
+                data:
+                  percentage: 100
+          - conditions:
+              - condition: numeric_state
+                entity_id: sensor.nmminer_192_168_1_101_temperature
+                above: 50
+                below: 60
+            sequence:
+              - service: fan.set_percentage
+                target:
+                  entity_id: fan.miner_cooling_fan
+                data:
+                  percentage: 75
+        default:
+          - service: fan.set_percentage
+            target:
+              entity_id: fan.miner_cooling_fan
+            data:
+              percentage: 50
+```
+
+### Night Mode - Reduce Mining During Peak Hours
+
+```yaml
+automation:
+  - alias: "NMMiner - Night Mode"
+    description: "Reduce power during expensive electricity hours"
+    trigger:
+      - platform: time
+        at: "22:00:00"
+        id: "night"
+      - platform: time
+        at: "06:00:00"
+        id: "day"
+    action:
+      - choose:
+          - conditions:
+              - condition: trigger
+                id: "night"
+            sequence:
+              # Your miners might not support this directly,
+              # but you could turn off some miners
+              - service: switch.turn_off
+                target:
+                  entity_id: 
+                    - switch.miner_2_power
+                    - switch.miner_3_power
+              - service: notify.mobile_app_your_phone
+                data:
+                  message: "Night mode: 2 miners powered down"
+          - conditions:
+              - condition: trigger
+                id: "day"
+            sequence:
+              - service: switch.turn_on
+                target:
+                  entity_id:
+                    - switch.miner_2_power
+                    - switch.miner_3_power
+              - service: notify.mobile_app_your_phone
+                data:
+                  message: "Day mode: All miners powered up"
+```
+
+## Integration with Other Systems
+
+### Log to Google Sheets
+
+```yaml
+automation:
+  - alias: "NMMiner - Log Block to Sheets"
+    trigger:
+      - platform: event
+        event_type: nmminer_block_found
+    action:
+      - service: rest_command.log_to_sheets
+        data:
+          timestamp: "{{ now().isoformat() }}"
+          miner_ip: "{{ trigger.event.data.miner_ip }}"
+          valid_blocks: "{{ trigger.event.data.valid_blocks }}"
+          best_diff: "{{ trigger.event.data.best_diff }}"
+
+# Configure in configuration.yaml:
+rest_command:
+  log_to_sheets:
+    url: "YOUR_GOOGLE_APPS_SCRIPT_URL"
+    method: POST
+    content_type: "application/json"
+    payload: >
+      {
+        "timestamp": "{{ timestamp }}",
+        "miner_ip": "{{ miner_ip }}",
+        "valid_blocks": "{{ valid_blocks }}",
+        "best_diff": "{{ best_diff }}"
+      }
+```
+
+### Announce via TTS
+
+```yaml
+automation:
+  - alias: "NMMiner - TTS Announcement"
+    trigger:
+      - platform: event
+        event_type: nmminer_block_found
+    action:
+      - service: tts.google_translate_say
+        target:
+          entity_id: media_player.living_room_speaker
+        data:
+          message: >
+            Attention! Bitcoin miner {{ trigger.event.data.miner_ip }} 
+            has found a valid block! Total blocks: {{ trigger.event.data.valid_blocks }}
+```

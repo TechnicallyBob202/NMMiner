@@ -1,0 +1,23 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "NMMiner Setup",
+        "description": "Configure the UDP port for NMMiner broadcast listening. Your ESP32 miners broadcast their status every 5 seconds on this port.",
+        "data": {
+          "port": "UDP Port"
+        },
+        "data_description": {
+          "port": "The UDP port to listen on for miner broadcasts (default: 37778)"
+        }
+      }
+    },
+    "error": {
+      "invalid_port": "Port must be between 1 and 65535",
+      "unknown": "Unexpected error occurred"
+    },
+    "abort": {
+      "already_configured": "NMMiner listener is already configured on this port"
+    }
+  }
+}
