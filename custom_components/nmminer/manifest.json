@@ -1,7 +1,8 @@
 {
   "domain": "nmminer",
   "name": "NMMiner",
-  "codeowners": [],
+  "icon": "mdi:pickaxe",
+  "codeowners": ["@TechnicallyBob202"],
   "config_flow": true,
   "documentation": "https://github.com/TechnicallyBob202/NMMiner",
   "issue_tracker": "https://github.com/TechnicallyBob202/NMMiner/issues",
